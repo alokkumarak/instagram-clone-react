@@ -1,0 +1,83 @@
+.post {
+  max-width: 500px;
+  background-color: #000;
+  border: 2px solid rgb(31, 25, 25);
+  margin: auto;
+  margin-bottom: 45px;
+  box-shadow: 0 0 15px rgb(41, 41, 41);
+}
+
+.post__image {
+  width: 100%;
+  object-fit: contain;
+  border-top: 1px solid rgb(31, 25, 25);
+  border-bottom: 1px solid rgb(31, 25, 25);
+}
+.post__text {
+  border-bottom: 1px solid rgb(31, 25, 25);
+  font-weight: normal;
+  padding: 20px;
+}
+
+.post__header {
+  display: flex;
+  align-items: center;
+  padding: 20px 10px;
+}
+
+.post__avatar {
+  margin-right: 10px;
+}
+.post__commentBox {
+  display: flex;
+
+  margin-bottom: 10px;
+}
+.post__input {
+  flex: 1;
+  padding: 10px;
+}
+.post__comment {
+  flex: 0;
+
+  cursor: pointer;
+  border: none;
+}
+.post__comments {
+  padding: 20px;
+}
+
+.post__icons {
+  padding-top: 10px;
+  padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.post_iconButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.post__saveButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  margin-right: 5px;
+}
+input {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid white;
+  transition: all 2s;
+}
+input:hover {
+  border-bottom: 3px solid blue;
+}
+@media only screen and(max-width:750px) {
+  .post {
+    width: 300px;
+  }
+}

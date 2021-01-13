@@ -1,0 +1,166 @@
+* steps to create the clone of instagram*
+ 1. create a react app
+ 
+ 2. setup and register the app in firebase
+ 
+ 3. install material ui core and icons ,firebase in this project.
+ 
+ 4. configure the app with firebase using a file name firebase.js and initialize the app also.
+         firebase is used for database, storage and authentication.
+ 5. select firestore in firebase.google.com for create posts and captions with name (username,imageUrl,caption).
+ 
+ 6. select hosting in firebase and in first step install firebase tools in this app.
+ 
+ 7. now let's move the creation of this amazing app.
+ 
+ 8. this app is basically divided into 3 components (navbar,posts,uploadImage select).
+ 
+ 9. create a navbar first with a logo and 2 buttons of login and signup (when user is logged in then that buttons will be logout and a simple avatar).
+ 
+ 10.stick the position of that navbar to the top(position-stickey and top-0).
+ 
+ 11.ok let's create a signup and login feature first.
+         signup and login button will take a material-ui (modal) to create a better look.
+         in firebase enable the login with email and password field.
+ 12. create 3 useState for  [username,setUsername] with null,[password,setPassword] with empty array and [email,setEmail] with empty array.
+
+ 13. now write some condition of user authentication if there is a user registers or logding then display (logout button and a simple avatar at the top) and if the user is not logged in then diplay login and signin button.
+
+ 14. create 2 useState for open if signin [openSignIn,setOpenSignIn] with false and [open,setOpen] with false if user is not signup.
+ 
+ 15. if user is logged in the in logout button simply pass the callback function auth.signOut() onClick.
+       else
+          user is not logged in the in login button pass the callback function onClick={()=>setOpenSignIn(true)} and in signUp button pass the callback function onClick={()=>setOpen(true)}         
+ 16.now create a signUp constant ,import auth variable form 'firebase.js'.  fire preventDefault function which will help to stop  the reloading the page during the signup of any user.
+         now run auth.createUserWithEmailAndPassword(email,password) and then fire the updateProfile function and display and register the user. Now if any error found then catch that error and alert the user before registration.
+         then set the email and password field to empty again.
+ 17.now create login function ,
+         add preventDefault function ,
+         now auth.signInWithEmailAndPassword(email,password)
+         if any error then catch throuth error.message
+         setOpenSignIn to false setPassword to empty again and setEmail empty.
+18. create models for login and signup,
+         signup modal with a function open={open} and a callback function onClose={()=>setOpen(false)}
+         create a form, inside it a button of type=submit (3 input fileds for username,email,password) ,
+         set value={username} onChange={(e)=>setusername(e.target.value)},value={email} onChange={(e)=>setEmail(e.target.value)} and value={password} onChange={(e)=>setPassword(e.target.value)}
+
+         in login modal with a function open={openSignIn} and a callback function onClose={()=>setOpenSignIn(false)}      
+         create a form, inside it a button of type=submit (2 input fileds for email,password)    ,
+         set value={email} onChange={(e)=>setEmail(e.target.value)} and value={password} onChange={(e)=>setPassword(e.target.value)} 
+
+19. now handle the user if anyone is logged in ,
+      create a useState [user,setUser] with null because there is no user at beginning.
+      now create a useEffect for changing the start if user hit the button to login or signup,
+       inside useEffect create a callback const unsubscribe=auth.onAuthStateChanged((authUser)=>{
+           if authUser exist in the database then fire setUser(authUser) else setUser(null) 
+       })and return unsubscribe function and also remember to set condition of useEffect [user,username]
+
+20. now handle the upload components if user is logged in.
+    {user?.displayName?(then show the Image upload component with username={user.displayName}):(show a message to signup first)}
+
+21.now create a imageUpload functional component,
+      set 3 useState for [caption,setCaption] empty array , [progress,setProgress] with 0 and [image,setImage] with null .
+22. in return create a progress with  value={progress} max="100", input for caption with a callback function  onChange={e=>setCaption(e.target.value)}, input with a function onChange={handleChange} and a button onClick={handleUpload}.
+
+23. create a handleChange function to handle the file upload ,
+         a callback function if(e.target.files[0]) then setImage(e.target.files[0]). the files[0] means if user select more than one file then always select the first one.
+
+24. create handleUpload callback function to handle the upload feature,
+             inside handleUpload create a const uploadTask=storage.ref(`images/${image.name}`).put(image);
+             storage will use the storage of firebase with reference of that path of the image then put that image .
+             now use that uploadTask to upload that image and caption to the firebase storage.
+             uploadTask.on(
+            "state_changed",
+            (snapshot)=>{
+                //progress function....
+                const progress=Math.round(
+                    (snapshot.bytesTransferred/snapshot.totalBytes)*100
+                );
+                setProgress(progress);
+            },
+            (error)=>{
+                //error function
+                 alert(error.message)
+            },
+            ()=>{
+                //complete function ...
+                storage.ref("images")
+                       .child(image.name)
+                       .getDownloadURL()
+                       .then(url=>{
+                           //posting the image inside the database
+                           db.collection("posts").add({
+                               timestamp:firebase.firestore.FieldValue.serverTimestamp(),
+                               caption:caption,
+                               imageUrl:url,
+                               username:username
+                           });
+                           setProgress(0);
+                           setCaption('');
+                           setImage(null);
+                       });
+                           
+
+            }
+        )
+        .
+        this is function for when state changed then take a snapshot of that then run the progressbar to 100% of that line after that setProgress to progress, and if there is any error then through that.
+        now run a callback function to upload a image using storage.ref of images fiels of database select there child image.name getdownload to the database then select the url of the image and add to the db.collection with timestamp of firebase,caption,imageUrl and username,
+        after all this function setProgress to 0 again ,setCaptionto empty again and set imagefield to null .
+
+    
+ 25. now create a component for display all the posts from database, post.js,
+         pass imageUrl,postId,user,username,caption.
+         in a single post we will have to display 3 section (without signin) or 4 section (with signin),(1 for display username and a avatar , 2nd for display image of that user and 3rd for display the caption and 4th for comment that can be used by any user who is logged in).
+
+        in header of the post display avatar and {username} then diaplay image with src={imageUrl}
+        then display {caption}.
+
+ 26.  if user is logged in then create a comment section , create a input with value={comment} and onChange={(e)=>setComment(e.target.value)}      .
+
+ 27.  also create a section to display all comments through map function.
+            {comments.map((comment)=>(
+                           <p><strong>{comment.username}</strong> ::- {comment.text}</p>
+                       ))}
+          this text and username will be created on firebase storage inside that post section.
+
+ 28. create 2 useState for create a comment of a loggedin user and for display all comments const [comments,setComments]=useState([]); const [comment,setComment]=useState('')
+
+ 29. useEffect for change the states and fetch data from tabels . if postId is matched then fetch from db.collection where table=posts document type=postId for display that post and collection of comments of thats perticular posts.
+          take the snapshot of the post and map all data from database and return that function .
+          don'tforget to give a condition of that useEffect of postId.
+                useEffect(()=>{
+      let unsubscribe;
+      if(postId){
+          unsubscribe=db
+                        .collection("posts")
+                        .doc(postId)
+                        .collection("comments")
+                        .orderBy('timestamp','desc')
+                        .onSnapshot((snapshot)=>{
+                            setComments(snapshot.docs.map((doc)=>doc.data()));
+                        });
+      }
+      return()=>{
+          unsubscribe();
+      };
+    },[postId]);
+
+ 30. now at the end create a function for posting the comment on that post.
+            go to the collection of that post where document id = postId find that collection add that comment with that text and username who is logged in.
+            and lastly setComment('') .
+
+             const postComment=(e)=>{
+       e.preventDefault();
+
+       db.collection("posts").doc(postId).collection("comments").add({
+           text:comment,
+           username:user.displayName,
+           timestamp:firebase.firestore.FieldValue.serverTimestamp()
+       })
+       setComment('');
+    }
+
+
+completed..............
+
